@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roamline — travel eSIM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="masthead">Roamline<em>.</em></div>
+    <nav class="head-nav">
+      <a onclick="goDialer()" id="navDialer" class="hidden">Dialer</a>
+      <a onclick="goMarket()">Catalogue</a>
+      <a onclick="goMine()" id="navMine" class="hidden">My eSIMs</a>
+      <a onclick="goWallet()" id="navWallet" class="hidden">Wallet</a>
+    </nav>
+    <div class="head-right">
+      <span id="headEmail" class="head-email">not signed in</span>
+      <span id="headBalance" class="head-balance hidden">$0.00</span>
+      <button class="head-cta" id="headCta" onclick="openSignup()">Sign in</button>
+    </div>
+  </div>
+</header>
+
+<div id="modalSignup" class="modal hidden">
+  <div class="modal-card">
+    <h2>Sign in.</h2>
+    <p class="sub">A local account, no password. Stored on this device.</p>
+    <div class="field"><label>Your name</label><input id="signupName" placeholder="Alex Morgan"></div>
+    <div class="field"><label>Email</label><input id="signupEmail" type="email" placeholder="alex@example.com"></div>
+    <button class="pay" onclick="doSignup()">Create account · $25 credit</button>
+    <button class="link" onclick="closeModal('modalSignup')">cancel</button>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <section id="view-market">
+    <div class="hero">
+      <div class="hero-grid">
+        <h1>Data that travels <em>lighter</em> than you do.</h1>
+        <div>
+                    <p>A pre-paid eSIM for your next trip. Scan once at the airport, land connected.</p>
+          <div style="margin-top: 12px; font-size: 13px; font-weight: 600; color: var(--accent); letter-spacing: 0.05em; text-transform: uppercase;">Made by Barin Soran</div>
+            <div class="hero-meta"><b id="planCount">—</b> plans · instant activation · no roaming shock</div>
+        </div>
+      </div>
+    </div>
+    <div class="section-head">
+      <h2>The catalogue</h2>
+      <span class="count" id="catalogueCount">—</span>
+    </div>
+        <div style="margin-bottom: 24px; text-align: right;">
+      <button class="buy" onclick="openCustomBuilder()" style="background:var(--ink); color:var(--paper);">+ Build Custom Plan</button>
+    </div>
+    <div class="plans" id="planGrid"></div>
+  </section>
+
+  <section id="view-checkout" class="checkout hidden">
+    <a class="back" onclick="backToMarket()">← the catalogue</a>
+    <div class="checkout-grid">
+      <div>
+        <h2>Checkout.</h2>
+        <div id="payMethodBox" class="pay-methods"></div>
+        <div class="field"><label>Card number</label><input id="cardNum" value="4242 4242 4242 4242" maxlength="19"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+          <div class="field"><label>Expiry</label><input id="cardExp" value="12/28" maxlength="5"></div>
+          <div class="field"><label>CVC</label><input id="cardCvc" value="123" maxlength="4"></div>
+        </div>
+        <div class="field"><label>Email for delivery</label><input id="buyerEmail" placeholder="you@example.com" type="email"></div>
+        <button class="pay" id="payBtn">Pay &amp; activate</button>
+        <p class="note">Simulated payment. No card is charged.</p>
+      </div>
+      <div>
+        <div class="summary" id="orderSummary"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-processing" class="processing hidden">
+    <h2>Issuing your eSIM.</h2>
+    <p>payment confirmed — provisioning profile</p>
+    <div class="dots"><span></span><span></span><span></span></div>
+  </section>
+
+  <section id="view-mine" class="mine hidden">
+    <div class="dash-head">
+      <h2>My <em>eSIMs</em>.</h2>
+      <span class="count" id="mineCount">—</span>
+    </div>
+    <!-- ADD THIS LINE -->
+    <div id="mineGrid" class="mine-grid"></div>
+  </section>
+
+  <section id="view-wallet" class="wallet hidden">
+    <div class="dash-head">
+      <h2>Your <em>wallet</em>.</h2>
+      <span class="head-balance big" id="walletBalance">$0.00</span>
+    </div>
+    <div class="packs" id="creditPacks"></div>
+    <div class="log">
+      <h3>Transactions</h3>
+      <div id="txnRows"></div>
+    </div>
+  </section>
+
+  <section id="view-dash" class="dash hidden">
+    <div class="dash-head">
+      <h2 id="dashTitle">Your <em>eSIM</em>.</h2>
+      <select class="country-select" id="countrySel"></select>
+    </div>
+    <div id="bannerSlot"></div>
+    <div class="dash-grid">
+      <div class="meter-card">
+        <div class="meter-label">Data remaining</div>
+        <div class="meter-big" id="leftBig">—</div>
+        <div class="bar"><div class="fill" id="barFill"></div></div>
+        <div class="bar-meta">
+          <span id="usedMeta">—</span>
+          <span id="pctMeta">—</span>
+        </div>
+        <div class="qr-block">
+          <img id="qrImg" alt="eSIM activation QR">
+          <div class="cap">Scan to add eSIM</div>
+        </div>
+      </div>
+      <div>
+        <div class="actions-head">Simulate usage</div>
+        <div class="usage-grid" id="usageGrid"></div>
+        <div class="topup-head">Top up data</div>
+        <div class="packs" id="packsGrid"></div>
+        <div style="margin-top:28px">
+          <button class="back" onclick="resetApp()">× reset simulator</button>
+        </div>
+      </div>
+    </div>
+    <div class="log">
+      <h3>Trip log</h3>
+      <div id="logRows"></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Roamline — a simulated eSIM</span>
+    <span>no real charges · no real network</span>
+  </div>
+</footer>
+
+<div id="modalCustom" class="modal hidden">
+  <div class="modal-card">
+    <h2>Build a plan.</h2>
+    <p class="sub">Pick your data and days. 1 GB = $3, 1 Day = $1.</p>
+    <div class="field">
+      <label>Data (GB)</label>
+      <input type="range" id="customData" min="1" max="50" value="5" oninput="updateCustomPrice()">
+      <div id="customDataLabel" style="font-size:24px; font-family:var(--serif); margin-top:8px;">5 GB</div>
+    </div>
+    <div class="field">
+      <label>Days</label>
+      <input type="range" id="customDays" min="1" max="60" value="14" oninput="updateCustomPrice()">
+      <div id="customDaysLabel" style="font-size:24px; font-family:var(--serif); margin-top:8px;">14 Days</div>
+    </div>
+    <div style="font-size:20px; font-family:var(--serif); margin: 24px 0;">Total: <span id="customPrice">$29.00</span></div>
+    <button class="pay" onclick="buyCustomPlan()">Buy Custom Plan</button>
+    <button class="link" onclick="closeModal('modalCustom')">cancel</button>
+  </div>
+</div>
+
+<div id="modalCustom" class="modal hidden">
+  <div class="modal-card">
+    <h2>Build a plan.</h2>
+    <p class="sub">Pick your data and days. 1 GB = $3, 1 Day = $1.</p>
+    <div class="field">
+      <label>Data (GB)</label>
+      <input type="range" id="customData" min="1" max="50" value="5" oninput="updateCustomPrice()">
+      <div id="customDataLabel" style="font-size:24px; font-family:var(--serif); margin-top:8px;">5 GB</div>
+    </div>
+    <div class="field">
+      <label>Days</label>
+      <input type="range" id="customDays" min="1" max="60" value="14" oninput="updateCustomPrice()">
+      <div id="customDaysLabel" style="font-size:24px; font-family:var(--serif); margin-top:8px;">14 Days</div>
+    </div>
+    <div style="font-size:20px; font-family:var(--serif); margin: 24px 0;">Total: <span id="customPrice">$29.00</span></div>
+    <button class="pay" onclick="buyCustomPlan()">Buy Custom Plan</button>
+    <button class="link" onclick="closeModal('modalCustom')">cancel</button>
+  </div>
+</div>
+
+<script src="js/state.js"></script>
+<script src="js/api.js"></script>
+<script src="js/views.js"></script>
+<script src="js/app.js"></script>
+<div id="modalDialer" class="modal hidden">
+  <div class="modal-card dialer-card">
+    <div class="dialer-screen" id="dialerDisplay">Enter number</div>
+    <div class="dialer-grid">
+      <button onclick="dialNum('1')">1</button>
+      <button onclick="dialNum('2')">2</button>
+      <button onclick="dialNum('3')">3</button>
+      <button onclick="dialNum('4')">4</button>
+      <button onclick="dialNum('5')">5</button>
+      <button onclick="dialNum('6')">6</button>
+      <button onclick="dialNum('7')">7</button>
+      <button onclick="dialNum('8')">8</button>
+      <button onclick="dialNum('9')">9</button>
+      <button onclick="dialNum('*')">*</button>
+      <button onclick="dialNum('0')">0</button>
+      <button onclick="dialNum('#')">#</button>
+    </div>
+    <div class="dialer-actions">
+      <button class="call-btn" id="callBtn" onclick="startCall()">Call</button>
+      <button class="end-btn hidden" id="endBtn" onclick="endCall()">End Call</button>
+      <button class="link" onclick="closeModal('modalDialer')">close</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
